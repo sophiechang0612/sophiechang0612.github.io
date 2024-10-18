@@ -1,8 +1,10 @@
+
+
 // 定義變數
 let canvas = document.getElementById("myCanvas");
 let ctx = canvas.getContext("2d");
-let x = 0, y = 0, dx = 5, dy = 5, r = 30, color = "#FF9D6F";
-let x2 = canvas.width, y2 = 0, dx2 = 5, dy2 = 5, r2 = 30, color2 = "#9999CC";
+let x = [0, canvas.width], y = [0, canvas.height], dx = [5, 10], dy = [5, 10], r = [30, 20], color = ["#FF9D6F", "#9999CC"];
+let N = 2;
 // 畫圓形
 function drawBall(x, y, r, color)
 {
@@ -18,25 +20,38 @@ function draw()
 {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    x = x + dx;
-    y = y + dy;
-	
-	x2 = x2 + dx2;
-    y2 = y2 + dy2;
+	for(let i = 0; i < N; ++i)
+	{
+		x[i] = x[i] + dx[i];
+		y[i] = y[i] + dy[i];
+	}
 
     // TODO: 如果發生碰撞(畫布寬canvas.width, 畫布高canvas.height)，則改變速度(dx, dy)和顏色(color)
-    if(x < 0 || x > canvas.width) dx = -dx;
-	if(y < 0 || y > canvas.height) dy = -dy;
-	
-	if(x2 < 0 || x2 > canvas.width) dx2 = -dx2;
-	if(y2 < 0 || y2 > canvas.height) dy2 = -dy2;
-    
-	if((x-x2)*(x-x2) + (y-y2)*(y-y2) <= (r+r2)*(r+r2))
+    for(let i = 0; i < N; ++i)
 	{
-		[dx, dy, dx2, dy2] = [dx2, dy2, dx, dy];
+		if(x[i] < 0 || x[i] > canvas.width) dx[i] = -dx[i];
+		if(y[i] < 0 || y[i] > canvas.height) dy[i] = -dy[i];
 	}
-	drawBall(x, y, r, color);
-	drawBall(x2, y2, r2, color2);
+	
+	for(let i = 0; i < N; ++i)
+		for(let j = i + 1; j < N; ++j)
+		{
+			if((x[i]-x[j])*(x[i]-x[j]) + (y[i]-y[j])*(y[i]-y[j]) <= (r[i]+r[j])*(r[i]+r[j]))
+			{
+				[dx[i], dx[j]] = [dx[j], dx[i]];
+				[dy[i], dy[j]] = [dy[j], dy[i]];
+				color[i] = '#' + Math.floor(Math.random()*16777215).toString(16);
+				color[j] = '#' + Math.floor(Math.random()*16777215).toString(16);
+			}
+		}
+	
+	for(let i = 0; i < N; ++i)
+	{
+		drawBall(x[i], y[i], r[i], color[i]);
+	}
+	
     requestAnimationFrame(draw);
 }
 draw();
+
+
